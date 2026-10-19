@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PixelForge — Pixel Art Studio</title>
+<style>
+:root{color-scheme:dark;--bg:#101218;--panel:#191c25;--panel2:#202430;--line:#303544;--text:#e8eaf2;--muted:#9299ad;--accent:#9a8cff;--accent2:#7668e8;--good:#8bd8b1}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:13px/1.4 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:hidden}
+button,input,select{font:inherit;color:inherit}button{border:1px solid var(--line);background:var(--panel2);border-radius:7px;padding:7px 10px;cursor:pointer;transition:.12s}button:hover{border-color:#6b7190;background:#292e3d}button:disabled{opacity:.35;cursor:default}button.active{background:#39345e;border-color:var(--accent);color:#fff}button.primary{background:var(--accent2);border-color:var(--accent2);color:white}button.iconbtn{width:34px;height:32px;padding:0;font-size:16px;display:grid;place-items:center}
+.topbar{height:54px;display:flex;align-items:center;gap:14px;padding:0 16px;border-bottom:1px solid var(--line);background:#151720}
+.brand{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:750;letter-spacing:.2px;white-space:nowrap}.logo{width:27px;height:27px;border-radius:7px;background:linear-gradient(135deg,#b6aaff,#7566e9);display:grid;place-items:center;color:#151321;font-weight:900}
+.topgroup{display:flex;align-items:center;gap:6px}.topspacer{flex:1}.status{font-size:11px;color:var(--muted);white-space:nowrap}.status span{color:var(--good)}
+.workspace{height:calc(100vh - 78px);display:grid;grid-template-columns:54px minmax(0,1fr) 244px;gap:0}
+.toolbar{background:var(--panel);border-right:1px solid var(--line);padding:10px 7px;display:flex;flex-direction:column;align-items:center;gap:6px}.tool{width:38px;height:38px;border-radius:8px;padding:0;display:grid;place-items:center;font-size:17px}.toolsep{width:27px;height:1px;background:var(--line);margin:5px 0}
+.stage{position:relative;min-width:0;display:flex;flex-direction:column;background-color:#12141b;background-image:radial-gradient(#282b37 .8px,transparent .8px);background-size:17px 17px}
+.stagehead{height:42px;border-bottom:1px solid #282c38;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:#151720bb}
+.stagehead .meta{color:var(--muted);font-size:11px}.stagecontrols{display:flex;gap:5px;align-items:center}
+.canvasarea{flex:1;min-height:0;display:grid;place-items:center;overflow:hidden;position:relative;touch-action:none}
+.canvaswrap{position:relative;box-shadow:0 14px 50px #0008;line-height:0;max-width:95%;max-height:95%}
+#view{display:block;image-rendering:pixelated;cursor:crosshair;touch-action:none}
+.rightpanel{background:var(--panel);border-left:1px solid var(--line);overflow:auto;padding:0 13px 16px}
+.panelsection{padding:15px 0;border-bottom:1px solid var(--line)}.sectionhead{display:flex;align-items:center;justify-content:space-between;font-weight:700;margin-bottom:12px}.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:750}
+.row{display:flex;align-items:center;gap:7px}.row>*{min-width:0}.row+.row{margin-top:9px}.grow{flex:1}.small{font-size:11px;color:var(--muted)}.field{width:100%;background:#11141b;border:1px solid var(--line);border-radius:6px;padding:7px 8px;outline:none}.field:focus{border-color:var(--accent)}.fieldlabel{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}
+.colorwell{width:37px;height:34px;border-radius:7px;border:1px solid #555c70;padding:3px;background:#11141b;cursor:pointer}.colorwell input{width:100%;height:100%;border:0;padding:0;background:none}
+.palette{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px}.swatch{aspect-ratio:1;border-radius:5px;padding:0;border:1px solid #ffffff24;min-width:0}.swatch:hover{transform:scale(1.08)}.swatch.selected{outline:2px solid var(--accent);outline-offset:2px}
+.toolsettings{display:grid;grid-template-columns:1fr 1fr;gap:8px}.checkrow{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:12px}.checkrow input{accent-color:var(--accent)}
+.footer{height:24px;border-top:1px solid var(--line);background:#151720;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:var(--muted);font-size:10px}
+.toast{position:fixed;left:50%;bottom:42px;transform:translate(-50%,12px);opacity:0;pointer-events:none;background:#282d3b;border:1px solid #454c61;border-radius:9px;padding:10px 15px;box-shadow:0 8px 25px #0007;transition:.2s;z-index:10}.toast.show{opacity:1;transform:translate(-50%,0)}
+.modalback{position:fixed;inset:0;background:#0009;display:none;place-items:center;z-index:20}.modalback.show{display:grid}.modal{width:min(380px,calc(100vw - 30px));background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;box-shadow:0 25px 70px #0008}.modal h2{font-size:16px;margin:0 0 14px}.modalfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+@media(max-width:850px){.workspace{grid-template-columns:48px minmax(0,1fr)}.rightpanel{display:none}.topbar{gap:8px;padding:0 9px}.brand{font-size:13px}.status{display:none}.topgroup button{padding:6px 7px}}
+@media(max-width:500px){.topbar{height:50px}.topgroup .optional{display:none}.workspace{height:calc(100vh - 74px)}.stagehead{padding:0 8px}.tool{width:34px;height:34px}.toolbar{padding:8px 5px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><div class="logo">P</div>PixelForge <span style="font-size:10px;color:var(--muted);font-weight:500">STUDIO</span></div>
+  <div class="topgroup">
+    <button id="newBtn" title="新建画布">＋ 新建</button>
+    <button id="openBtn" title="打开 PNG 图像">打开</button>
+    <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+  </div>
+  <div class="topspacer"></div>
+  <div class="topgroup">
+    <button id="undoBtn" class="iconbtn" title="撤销 (Ctrl+Z)">↶</button>
+    <button id="redoBtn" class="iconbtn" title="重做 (Ctrl+Y)">↷</button>
+    <button id="clearBtn" class="optional" title="清空画布">清空</button>
+    <button id="exportBtn" class="primary">导出 PNG ↓</button>
+  </div>
+</header>
+<div class="workspace">
+  <aside class="toolbar" aria-label="绘画工具">
+    <button class="tool active" data-tool="pencil" title="铅笔 (B)">✎</button>
+    <button class="tool" data-tool="eraser" title="橡皮擦 (E)">▱</button>
+    <button class="tool" data-tool="fill" title="油漆桶 (G)">▨</button>
+    <button class="tool" data-tool="eyedropper" title="吸管 (I)">⌖</button>
+    <div class="toolsep"></div>
+    <button class="tool" data-tool="line" title="直线 (L)">／</button>
+    <button class="tool" data-tool="rect" title="矩形 (U)">□</button>
+    <div class="toolsep"></div>
+    <button class="tool" id="gridBtn" title="切换像素网格">▦</button>
+    <button class="tool" id="resetViewBtn" title="重置缩放">⌕</button>
+    <div style="flex:1"></div>
+    <button class="tool" id="helpBtn" title="快捷键">?</button>
+  </aside>
+  <main class="stage">
+    <div class="stagehead">
+      <div><strong id="docName">Untitled Sprite</strong><div class="meta" id="canvasMeta">32 × 32 px · RGBA</div></div>
+      <div class="stagecontrols">
+        <button class="iconbtn" id="zoomOut" title="缩小">−</button><span id="zoomLabel" class="small" style="width:42px;text-align:center">800%</span><button class="iconbtn" id="zoomIn" title="放大">＋</button>
+      </div>
+    </div>
+    <div class="canvasarea" id="canvasArea"><div class="canvaswrap"><canvas id="view" width="512" height="512"></canvas></div></div>
+  </main>
+  <aside class="rightpanel">
+    <section class="panelsection">
+      <div class="sectionhead">颜色 <span class="eyebrow">COLOR</span></div>
+      <div class="row">
+        <div class="colorwell"><input type="color" id="colorPicker" value="#7c6cf0" title="选择颜色"></div>
+        <div class="grow"><input class="field" id="hexInput" value="#7C6CF0" maxlength="7" aria-label="HEX 颜色值"></div>
+        <button id="swapColor" title="切换前景/背景色">⇄</button>
+      </div>
+      <div class="row"><div class="grow"><span class="fieldlabel">前景色</span><div id="fgLabel">#7C6CF0</div></div><div class="grow"><span class="fieldlabel">背景色</span><div id="bgLabel">#FFFFFF</div></div></div>
+      <div class="row"><label class="fieldlabel" style="margin:0">调色板</label><button id="addSwatch" style="margin-left:auto;padding:4px 7px">＋ 添加当前色</button></div>
+      <div class="palette" id="palette" style="margin-top:10px"></div>
+    </section>
+    <section class="panelsection">
+      <div class="sectionhead">工具设置 <span class="eyebrow">TOOLS</span></div>
+      <div class="toolsettings">
+        <div><label class="fieldlabel" for="brushSize">笔刷尺寸</label><select class="field" id="brushSize"><option>1</option><option>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select></div>
+        <div><label class="fieldlabel" for="shapeMode">矩形模式</label><select class="field" id="shapeMode"><option value="outline">空心</option><option value="filled">实心</option></select></div>
+      </div>
+      <div style="margin-top:12px;display:grid;gap:9px">
+        <label class="checkrow"><input type="checkbox" id="gridCheck" checked> 显示像素网格</label>
+        <label class="checkrow"><input type="checkbox" id="transparentCheck" checked> 透明背景棋盘格</label>
+      </div>
+    </section>
+    <section class="panelsection">
+      <div class="sectionhead">画布 <span class="eyebrow">CANVAS</span></div>
+      <div class="row"><div class="grow"><label class="fieldlabel" for="widthInput">宽度 (px)</label><input class="field" type="number" min="1" max="512" id="widthInput" value="32"></div><div class="grow"><label class="fieldlabel" for="heightInput">高度 (px)</label><input class="field" type="number" min="1" max="512" id="heightInput" value="32"></div></div>
+      <button id="resizeBtn" style="width:100%;margin-top:10px">调整画布尺寸</button>
+      <p class="small">最大尺寸 512 × 512。调整尺寸会保留左上角范围内的图像。</p>
+    </section>
+    <section class="panelsection">
+      <div class="sectionhead">工作区 <span class="eyebrow">WORKSPACE</span></div>
+      <div class="row"><div class="grow"><div class="small">本地自动保存</div><strong id="autosaveState" style="font-size:12px">已启用</strong></div><button id="saveProjectBtn">保存项目</button></div>
+      <div class="small" style="margin-top:9px">项目数据仅保存在当前浏览器。导出 PNG 可用于分享作品。</div>
+    </section>
+  </aside>
+</div>
+<footer class="footer"><span id="toolStatus">铅笔工具 · 点击并拖动绘画</span><span>PixelForge Preview 0.1 · <span id="pixelInfo">32 × 32 px</span></span></footer>
+<div class="toast" id="toast"></div>
+<div class="modalback" id="modalBack"><div class="modal"><h2 id="modalTitle">新建画布</h2><div id="modalBody"></div><div class="modalfoot"><button id="modalCancel">取消</button><button class="primary" id="modalConfirm">创建画布</button></div></div></div>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const view = $('view'), ctx = view.getContext('2d', {alpha:true});
+const checker = document.createElement('canvas'), checkerCtx = checker.getContext('2d');
+checker.width=checker.height=16; checkerCtx.fillStyle='#e3e5eb';checkerCtx.fillRect(0,0,16,16);checkerCtx.fillStyle='#c5c9d3';checkerCtx.fillRect(0,0,8,8);checkerCtx.fillRect(8,8,8,8);
+let W=32,H=32,pixels=new Uint8ClampedArray(W*H*4), zoom=8, showGrid=true, showChecker=true, tool='pencil', fg='#7c6cf0',bg='#ffffff',drawing=false,start=null,last=null,preview=null,history=[],future=[],dirty=false,projectName='Untitled Sprite';
+const toolNames={pencil:'铅笔',eraser:'橡皮擦',fill:'油漆桶',eyedropper:'吸管',line:'直线',rect:'矩形'};
+const defaultPalette=['#111827','#ffffff','#d8dce7','#9299ad','#5a6073','#e65c70','#f29a68','#f3cd68','#b8df75','#53c9a2','#5db6d7','#5c85e8','#7c6cf0','#b58cf5','#ed8ac8','#7a4b39','#343b4d','#182d4e','#245c53','#8a9b49','#c9a77a','#eddfc8','#ffb3a7','#f5f0a0'];
+let palette=[...defaultPalette];
+function clonePixels(){return new Uint8ClampedArray(pixels)}
+function pushHistory(){history.push(clonePixels());if(history.length>80)history.shift();future=[];updateUndoButtons()}
+function updateUndoButtons(){$('undoBtn').disabled=!history.length;$('redoBtn').disabled=!future.length}
+function setStatus(msg){$('toolStatus').textContent=msg}
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),1900)}
+function hexToRgba(hex){let h=hex.replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16);return [(n>>16)&255,(n>>8)&255,n&255,255]}
+function hexNorm(s){if(!/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.test(s))return null;let h=s.replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');return '#'+h.toLowerCase()}
+function idx(x,y){return (y*W+x)*4}
+function getColor(x,y){if(x<0||y<0||x>=W||y>=H)return [0,0,0,0];let i=idx(x,y);return [...pixels.slice(i,i+4)]}
+function setPixel(x,y,color){if(x<0||y<0||x>=W||y>=H)return;const i=idx(x,y);pixels[i]=color[0];pixels[i+1]=color[1];pixels[i+2]=color[2];pixels[i+3]=color[3]??255}
+function paintBrush(x,y,color){const s=+$('brushSize').value,off=Math.floor((s-1)/2);for(let yy=0;yy<s;yy++)for(let xx=0;xx<s;xx++)setPixel(x+xx-off,y+yy-off,color)}
+function linePoints(x0,y0,x1,y1,fn){let dx=Math.abs(x1-x0),sx=x0<x1?1:-1,dy=-Math.abs(y1-y0),sy=y0<y1?1:-1,err=dx+dy;while(true){fn(x0,y0);if(x0===x1&&y0===y1)break;let e2=2*err;if(e2>=dy){err+=dy;x0+=sx}if(e2<=dx){err+=dx;y0+=sy}}}
+function drawLine(x0,y0,x1,y1,color){linePoints(x0,y0,x1,y1,(x,y)=>paintBrush(x,y,color))}
+function drawRect(x0,y0,x1,y1,color,filled){let minX=Math.min(x0,x1),maxX=Math.max(x0,x1),minY=Math.min(y0,y1),maxY=Math.max(y0,y1);for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++)if(filled||x===minX||x===maxX||y===minY||y===maxY)paintBrush(x,y,color)}
+function floodFill(x,y,color){const target=getColor(x,y);if(target.every((v,i)=>v===color[i]))return;const stack=[[x,y]],seen=new Uint8Array(W*H);while(stack.length){const [cx,cy]=stack.pop();if(cx<0||cy<0||cx>=W||cy>=H)continue;const p=cy*W+cx;if(seen[p])continue;seen[p]=1;const c=getColor(cx,cy);if(!c.every((v,i)=>v===target[i]))continue;setPixel(cx,cy,color);stack.push([cx+1,cy],[cx-1,cy],[cx,cy+1],[cx,cy-1])}}
+function render(){
+ const dpr=window.devicePixelRatio||1;
+ const maxW=Math.max(120,$('canvasArea').clientWidth-50),maxH=Math.max(120,$('canvasArea').clientHeight-50);
+ const scale=Math.max(1,Math.min(zoom,Math.floor(Math.min(maxW/W,maxH/H))));
+ const cw=W*scale,ch=H*scale;
+ view.width=cw*dpr;view.height=ch*dpr;view.style.width=cw+'px';view.style.height=ch+'px';ctx.setTransform(dpr,0,0,dpr,0,0);ctx.imageSmoothingEnabled=false;
+ ctx.clearRect(0,0,cw,ch);
+ if(showChecker){ctx.fillStyle=ctx.createPattern(checker,'repeat');ctx.fillRect(0,0,cw,ch)}
+ const img=ctx.createImageData(W,H);img.data.set(pixels);const tmp=document.createElement('canvas');tmp.width=W;tmp.height=H;tmp.getContext('2d').putImageData(img,0,0);ctx.drawImage(tmp,0,0,cw,ch);
+ if(preview){ctx.save();ctx.globalAlpha=.8;ctx.fillStyle=preview.color;ctx.strokeStyle=preview.color;if(preview.tool==='line'){ctx.beginPath();ctx.moveTo((preview.x0+.5)*scale,(preview.y0+.5)*scale);ctx.lineTo((preview.x1+.5)*scale,(preview.y1+.5)*scale);ctx.lineWidth=+$('brushSize').value*scale;ctx.lineCap='square';ctx.stroke()}else if(preview.tool==='rect'){const x=Math.min(preview.x0,preview.x1)*scale,y=Math.min(preview.y0,preview.y1)*scale,w=(Math.abs(preview.x1-preview.x0)+1)*scale,h=(Math.abs(preview.y1-preview.y0)+1)*scale;if($('shapeMode').value==='filled')ctx.fillRect(x,y,w,h);else ctx.strokeRect(x+scale/2,y+scale/2,w-scale,h-scale)}ctx.restore()}
+ if(showGrid&&scale>=4){ctx.beginPath();ctx.strokeStyle='rgba(55,61,79,.55)';ctx.lineWidth=1;for(let x=1;x<W;x++){ctx.moveTo(x*scale+.5,0);ctx.lineTo(x*scale+.5,ch)}for(let y=1;y<H;y++){ctx.moveTo(0,y*scale+.5);ctx.lineTo(cw,y*scale+.5)}ctx.stroke()}
+ $('canvasMeta').textContent=`${W} × ${H} px · RGBA`;$('pixelInfo').textContent=`${W} × ${H} px`;$('zoomLabel').textContent=`${Math.round(scale*100)}%`;$('widthInput').value=W;$('heightInput').value=H;
+}
+function pointerPixel(e){const r=view.getBoundingClientRect();return {x:Math.max(0,Math.min(W-1,Math.floor((e.clientX-r.left)/r.width*W))),y:Math.max(0,Math.min(H-1,Math.floor((e.clientY-r.top)/r.height*H)))}}
+function activeColor(){return tool==='eraser'?[0,0,0,0]:hexToRgba(fg)}
+function setTool(t){tool=t;document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));setStatus((toolNames[t]||t)+'工具 · 点击并拖动绘画')}
+function updateColorUI(){ $('colorPicker').value=fg;$('hexInput').value=fg.toUpperCase();$('fgLabel').textContent=fg.toUpperCase();$('bgLabel').textContent=bg.toUpperCase();renderPalette()}
+function renderPalette(){const root=$('palette');root.innerHTML='';palette.forEach(c=>{const b=document.createElement('button');b.className='swatch'+(c.toLowerCase()===fg.toLowerCase()?' selected':'');b.style.background=c;b.title=c;b.setAttribute('aria-label',c);b.onclick=()=>{fg=c;updateColorUI()};root.appendChild(b)})}
+function setForeground(c){fg=c;updateColorUI()}
+function saveLocal(){try{localStorage.setItem('pixelforge-stage1',JSON.stringify({W,H,pixels:Array.from(pixels),fg,bg,palette,projectName}));$('autosaveState').textContent='已自动保存';dirty=false}catch(e){$('autosaveState').textContent='保存失败';}}
+let saveTimer;function scheduleSave(){dirty=true;$('autosaveState').textContent='保存中…';clearTimeout(saveTimer);saveTimer=setTimeout(saveLocal,250)}
+function loadLocal(){try{const s=JSON.parse(localStorage.getItem('pixelforge-stage1'));if(!s||!s.W||!s.H||!s.pixels)return false;W=s.W;H=s.H;pixels=new Uint8ClampedArray(s.pixels);fg=s.fg||fg;bg=s.bg||bg;palette=s.palette||palette;projectName=s.projectName||projectName;$('docName').textContent=projectName;updateColorUI();return true}catch(e){return false}}
+function undo(){if(!history.length)return;future.push(clonePixels());pixels=history.pop();render();scheduleSave();updateUndoButtons()}
+function redo(){if(!future.length)return;history.push(clonePixels());pixels=future.pop();render();scheduleSave();updateUndoButtons()}
+function exportPNG(){const out=document.createElement('canvas');out.width=W;out.height=H;out.getContext('2d').putImageData((()=>{const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');const im=x.createImageData(W,H);im.data.set(pixels);return im})(),0,0);const a=document.createElement('a');a.download=(projectName.replace(/[^a-z0-9-_]+/gi,'-')||'pixelforge-art')+'.png';a.href=out.toDataURL('image/png');a.click();toast('PNG 已导出')}
+function openImage(file){if(!file)return;const url=URL.createObjectURL(file),img=new Image();img.onload=()=>{pushHistory();W=Math.min(512,img.naturalWidth);H=Math.min(512,img.naturalHeight);const c=document.createElement('canvas');c.width=W;c.height=H;c.getContext('2d').drawImage(img,0,0,W,H);pixels=new Uint8ClampedArray(c.getContext('2d').getImageData(0,0,W,H).data);projectName=file.name.replace(/\.[^.]+$/,'')||'Imported Sprite';$('docName').textContent=projectName;zoom=Math.max(1,Math.floor(500/Math.max(W,H)));render();scheduleSave();URL.revokeObjectURL(url);toast('图像已打开')};img.src=url}
+function openModal(title,body,confirmLabel,fn){$('modalTitle').textContent=title;$('modalBody').innerHTML=body;$('modalConfirm').textContent=confirmLabel;$('modalBack').classList.add('show');const close=()=>{$('modalBack').classList.remove('show');$('modalConfirm').onclick=null};$('modalCancel').onclick=close;$('modalConfirm').onclick=()=>{fn(close)}}
+function newCanvas(){openModal('新建画布',`<div class="row"><div class="grow"><label class="fieldlabel">宽度 (px)</label><input class="field" id="newW" type="number" min="1" max="512" value="32"></div><div class="grow"><label class="fieldlabel">高度 (px)</label><input class="field" id="newH" type="number" min="1" max="512" value="32"></div></div><p class="small">创建新画布会替换当前作品。建议先导出当前 PNG。</p>`,'创建画布',close=>{const w=+$('newW').value,h=+$('newH').value;if(w<1||h<1||w>512||h>512){toast('尺寸必须在 1–512 之间');return}pushHistory();W=w;H=h;pixels=new Uint8ClampedArray(W*H*4);projectName='Untitled Sprite';$('docName').textContent=projectName;history=[];future=[];updateUndoButtons();zoom=Math.max(1,Math.floor(500/Math.max(W,H)));render();scheduleSave();close()})}
+view.addEventListener('pointerdown',e=>{if(e.button!==0)return;view.setPointerCapture(e.pointerId);const p=pointerPixel(e);if(tool==='eyedropper'){const c=getColor(p.x,p.y);if(c[3])setForeground('#'+c.slice(0,3).map(v=>v.toString(16).padStart(2,'0')).join(''));return}if(tool==='fill'){pushHistory();floodFill(p.x,p.y,hexToRgba(fg));render();scheduleSave();return}pushHistory();drawing=true;start=p;last=p;if(tool==='pencil'||tool==='eraser'){paintBrush(p.x,p.y,activeColor());render()}else{preview={tool,x0:p.x,y0:p.y,x1:p.x,y1:p.y,color:fg};render()}});
+view.addEventListener('pointermove',e=>{const p=pointerPixel(e);if(!drawing)return;if(tool==='pencil'||tool==='eraser'){linePoints(last.x,last.y,p.x,p.y,(x,y)=>paintBrush(x,y,activeColor()));last=p;render()}else if(preview){preview.x1=p.x;preview.y1=p.y;render()}});
+function endDraw(e){if(!drawing)return;drawing=false;const p=pointerPixel(e);if(preview){if(preview.tool==='line')drawLine(preview.x0,preview.y0,p.x,p.y,hexToRgba(fg));else drawRect(preview.x0,preview.y0,p.x,p.y,hexToRgba(fg),$('shapeMode').value==='filled');preview=null}render();scheduleSave()}
+view.addEventListener('pointerup',endDraw);view.addEventListener('pointercancel',endDraw);
+document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
+$('colorPicker').oninput=e=>setForeground(e.target.value);$('hexInput').onchange=e=>{const c=hexNorm(e.target.value);if(c)setForeground(c);else{e.target.value=fg.toUpperCase();toast('请输入有效的 HEX 颜色')}};$('swapColor').onclick=()=>{[fg,bg]=[bg,fg];updateColorUI()};$('addSwatch').onclick=()=>{if(!palette.includes(fg))palette.push(fg);renderPalette();scheduleSave()};
+$('undoBtn').onclick=undo;$('redoBtn').onclick=redo;$('exportBtn').onclick=exportPNG;$('newBtn').onclick=newCanvas;$('openBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=e=>openImage(e.target.files[0]);$('clearBtn').onclick=()=>{if(confirm('确定清空整张画布？')){pushHistory();pixels=new Uint8ClampedArray(W*H*4);render();scheduleSave();toast('画布已清空')}};
+$('zoomIn').onclick=()=>{zoom=Math.min(64,zoom+1);render()};$('zoomOut').onclick=()=>{zoom=Math.max(1,zoom-1);render()};$('resetViewBtn').onclick=()=>{zoom=Math.max(1,Math.floor(Math.min($('canvasArea').clientWidth/W,$('canvasArea').clientHeight/H)-2));render()};$('gridBtn').onclick=()=>{$('gridCheck').checked=!$('gridCheck').checked;showGrid=$('gridCheck').checked;render()};$('gridCheck').onchange=e=>{showGrid=e.target.checked;render()};$('transparentCheck').onchange=e=>{showChecker=e.target.checked;render()};
+$('resizeBtn').onclick=()=>{const w=+$('widthInput').value,h=+$('heightInput').value;if(w<1||h<1||w>512||h>512){toast('尺寸必须在 1–512 之间');return}if(w===W&&h===H)return;pushHistory();const oldW=W,oldH=H,old=pixels;W=w;H=h;pixels=new Uint8ClampedArray(W*H*4);for(let y=0;y<Math.min(H,oldH);y++)for(let x=0;x<Math.min(W,oldW);x++){const oi=(y*oldW+x)*4,ni=(y*W+x)*4;pixels.set(old.slice(oi,oi+4),ni)}render();scheduleSave();toast('画布尺寸已调整')};
+$('saveProjectBtn').onclick=()=>{saveLocal();const data={format:'PixelForge',version:1,width:W,height:H,projectName,pixels:Array.from(pixels),foreground:fg,background:bg,palette};const blob=new Blob([JSON.stringify(data)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(projectName.replace(/[^a-z0-9-_]+/gi,'-')||'pixelforge-project')+'.pixelforge.json';a.click();URL.revokeObjectURL(a.href);toast('项目文件已保存')};
+$('helpBtn').onclick=()=>toast('快捷键：B 铅笔 · E 橡皮 · G 填充 · I 吸管 · L 直线 · U 矩形 · Ctrl+Z 撤销');
+window.addEventListener('keydown',e=>{if(e.target.matches('input,select,textarea'))return;const k=e.key.toLowerCase();if((e.ctrlKey||e.metaKey)&&k==='z'){e.preventDefault();undo();return}if((e.ctrlKey||e.metaKey)&&k==='y'){e.preventDefault();redo();return}const map={b:'pencil',e:'eraser',g:'fill',i:'eyedropper',l:'line',u:'rect'};if(map[k])setTool(map[k]);if(k==='+'||k==='='){$('zoomIn').click()}if(k==='-')$('zoomOut').click();if(k==='delete'||k==='backspace')$('clearBtn').click()});
+window.addEventListener('resize',render);
+if(!loadLocal()){renderPalette();render();saveLocal()}else{render();saveLocal()}updateUndoButtons();renderPalette();
+})();
+</script>
+</body>
+</html>
