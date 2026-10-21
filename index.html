@@ -74,37 +74,37 @@ button,input,select{font:inherit;color:inherit}button{border:1px solid var(--lin
   </main>
   <aside class="rightpanel">
     <section class="panelsection">
-      <div class="sectionhead">颜色 <span class="eyebrow">COLOR</span></div>
+      <div class="sectionhead">COLOR</div>
       <div class="row">
         <div class="colorwell"><input type="color" id="colorPicker" value="#7c6cf0" title="选择颜色"></div>
         <div class="grow"><input class="field" id="hexInput" value="#7C6CF0" maxlength="7" aria-label="HEX 颜色值"></div>
         <button id="swapColor" title="切换前景/背景色">⇄</button>
       </div>
-      <div class="row"><div class="grow"><span class="fieldlabel">前景色</span><div id="fgLabel">#7C6CF0</div></div><div class="grow"><span class="fieldlabel">背景色</span><div id="bgLabel">#FFFFFF</div></div></div>
-      <div class="row"><label class="fieldlabel" style="margin:0">调色板</label><button id="addSwatch" style="margin-left:auto;padding:4px 7px">＋ 添加当前色</button></div>
+      <div class="row"><div class="grow"><span class="fieldlabel">Foreground</span><div id="fgLabel">#7C6CF0</div></div><div class="grow"><span class="fieldlabel">Background</span><div id="bgLabel">#FFFFFF</div></div></div>
+      <div class="row"><label class="fieldlabel" style="margin:0">Palette</label><button id="addSwatch" style="margin-left:auto;padding:4px 7px">＋ Add Current Color</button></div>
       <div class="palette" id="palette" style="margin-top:10px"></div>
     </section>
     <section class="panelsection">
-      <div class="sectionhead">工具设置 <span class="eyebrow">TOOLS</span></div>
+      <div class="sectionhead">TOOL</div>
       <div class="toolsettings">
-        <div><label class="fieldlabel" for="brushSize">笔刷尺寸</label><select class="field" id="brushSize"><option>1</option><option>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select></div>
-        <div><label class="fieldlabel" for="shapeMode">矩形模式</label><select class="field" id="shapeMode"><option value="outline">空心</option><option value="filled">实心</option></select></div>
+        <div><label class="fieldlabel" for="brushSize">Brush Size</label><select class="field" id="brushSize"><option>1</option><option>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select></div>
+        <div><label class="fieldlabel" for="shapeMode">Rectangle Mode</label><select class="field" id="shapeMode"><option value="outline">Hollow</option><option value="filled">Solid</option></select></div>
       </div>
       <div style="margin-top:12px;display:grid;gap:9px">
-        <label class="checkrow"><input type="checkbox" id="gridCheck" checked> 显示像素网格</label>
-        <label class="checkrow"><input type="checkbox" id="transparentCheck" checked> 透明背景棋盘格</label>
+        <label class="checkrow"><input type="checkbox" id="gridCheck" checked>Display pixel grid</label>
+        <label class="checkrow"><input type="checkbox" id="transparentCheck" checked>Transparent Background</label>
       </div>
     </section>
     <section class="panelsection">
-      <div class="sectionhead">画布 <span class="eyebrow">CANVAS</span></div>
-      <div class="row"><div class="grow"><label class="fieldlabel" for="widthInput">宽度 (px)</label><input class="field" type="number" min="1" max="512" id="widthInput" value="32"></div><div class="grow"><label class="fieldlabel" for="heightInput">高度 (px)</label><input class="field" type="number" min="1" max="512" id="heightInput" value="32"></div></div>
-      <button id="resizeBtn" style="width:100%;margin-top:10px">调整画布尺寸</button>
-      <p class="small">最大尺寸 512 × 512。调整尺寸会保留左上角范围内的图像。</p>
+      <div class="sectionhead">CANVA</div>
+      <div class="row"><div class="grow"><label class="fieldlabel" for="widthInput">Width (px)</label><input class="field" type="number" min="1" max="512" id="widthInput" value="32"></div><div class="grow"><label class="fieldlabel" for="heightInput">Height (px)</label><input class="field" type="number" min="1" max="512" id="heightInput" value="32"></div></div>
+      <button id="resizeBtn" style="width:100%;margin-top:10px">Resize</button>
+      <p class="small">Maximum size is 512x512</p>
     </section>
     <section class="panelsection">
-      <div class="sectionhead">工作区 <span class="eyebrow">WORKSPACE</span></div>
-      <div class="row"><div class="grow"><div class="small">本地自动保存</div><strong id="autosaveState" style="font-size:12px">已启用</strong></div><button id="saveProjectBtn">保存项目</button></div>
-      <div class="small" style="margin-top:9px">项目数据仅保存在当前浏览器。导出 PNG 可用于分享作品。</div>
+      <div class="sectionhead">WORKSPACE</div>
+      <div class="row"><div class="grow"><div class="small">Auto Save</div><strong id="autosaveState" style="font-size:12px">Enabled</strong></div><button id="saveProjectBtn">Save Project</button></div>
+      <div class="small" style="margin-top:9px">Project data is only saved in the current browser, Export PNG to share your work</div>
     </section>
   </aside>
 </div>
